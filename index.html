@@ -654,7 +654,7 @@
     .big-card-wrap { display: flex; justify-content: center; }
     .real-card-img {
       width: 100%;
-      max-width: 380px;
+      max-width: 540px;
       border-radius: 20px;
       animation: floatCard 5s ease-in-out infinite;
       filter: drop-shadow(0 40px 60px rgba(0,0,0,.5));
@@ -1050,9 +1050,9 @@
       justify-content: center;
       overflow: hidden;
     }
-    /* On mobile portrait the video is square — match sticky height to width */
+    /* On mobile: ~78% viewport height, vertically centred */
     @media (max-width: 767px) {
-      .scroll-anim-sticky { height: 100vw; top: calc(50vh - 50vw); }
+      .scroll-anim-sticky { height: 78vh; top: 11vh; }
     }
 
     #app-canvas { position: absolute; top: 0; left: 0; }
@@ -1777,9 +1777,9 @@
 
     function resizeCanvas() {
       const dpr = window.devicePixelRatio || 1;
+      const sticky = canvas.parentElement;
       const w = window.innerWidth;
-      // Mobile portrait: square canvas so the square video fills perfectly
-      const h = (w < 768 && w < window.innerHeight) ? w : window.innerHeight;
+      const h = sticky ? sticky.offsetHeight : window.innerHeight;
       canvas.width  = w * dpr;
       canvas.height = h * dpr;
       canvas.style.width  = w + 'px';
@@ -1795,7 +1795,9 @@
       ctx.clearRect(0, 0, cw, ch);
       ctx.fillStyle = '#000000';
       ctx.fillRect(0, 0, cw, ch);
-      const scale = Math.min(cw / iw, ch / ih);
+      // Cover-fit on mobile portrait so the video fills the full screen height
+      const isMobilePt = window.innerWidth < 768 && window.innerWidth < window.innerHeight;
+      const scale = isMobilePt ? Math.max(cw / iw, ch / ih) : Math.min(cw / iw, ch / ih);
       const dw = iw * scale, dh = ih * scale;
       ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
     }
