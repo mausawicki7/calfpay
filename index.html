@@ -927,67 +927,178 @@
     .store-btn:hover { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.3); }
     .store-btn svg { width: 24px; height: 24px; flex-shrink: 0; }
 
-    /* ── FOOTER ─────────────────────────────────────────────────────────── */
-    .footer {
-      background: var(--dark);
+    /* ── CINEMATIC FOOTER ───────────────────────────────────────────────── */
+    .cf-footer {
+      position: relative;
+      background: #080A0D;
       color: rgba(255,255,255,.55);
-      border-top: 1px solid rgba(255,255,255,.07);
+      overflow: hidden;
     }
-    .footer-inner {
-      padding-block: 60px 32px;
-    }
-    .footer-top {
-      display: grid;
-      gap: 40px;
-      grid-template-columns: 1fr;
-      margin-bottom: 48px;
-    }
-    @media (min-width: 640px) { .footer-top { grid-template-columns: repeat(2, 1fr); } }
-    @media (min-width: 1024px) { .footer-top { grid-template-columns: 1.4fr 1fr 1fr 1fr; } }
 
+    /* Grid background */
+    .cf-grid {
+      position: absolute; inset: 0; pointer-events: none; z-index: 0;
+      background-size: 56px 56px;
+      background-image:
+        linear-gradient(to right,  rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.025) 1px, transparent 1px);
+      mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+      -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+    }
+
+    /* Aurora glow */
+    .cf-aurora {
+      position: absolute; left: 50%; top: 50%;
+      width: 75vw; height: 55vh;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(174,255,34,.09) 0%, rgba(0,165,187,.07) 45%, transparent 70%);
+      filter: blur(70px);
+      animation: cf-breathe 8s ease-in-out infinite alternate;
+      pointer-events: none; z-index: 0;
+    }
+    @keyframes cf-breathe {
+      0%   { transform: translate(-50%,-50%) scale(1);    opacity: .6; }
+      100% { transform: translate(-50%,-50%) scale(1.14); opacity: 1; }
+    }
+
+    /* Giant background text */
+    .cf-giant-text {
+      position: absolute;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(16vw, 22vw, 26vw);
+      font-weight: 900;
+      letter-spacing: -.05em;
+      line-height: .75;
+      white-space: nowrap;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255,255,255,.055);
+      background: linear-gradient(180deg, rgba(255,255,255,.07) 0%, transparent 65%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      pointer-events: none; z-index: 0; user-select: none;
+    }
+
+    /* Marquee strip */
+    .cf-marquee-wrap {
+      position: relative; z-index: 2;
+      overflow: hidden;
+      border-top: 1px solid rgba(255,255,255,.06);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      background: rgba(255,255,255,.015);
+      backdrop-filter: blur(6px);
+      padding: 11px 0;
+      transform: rotate(-1.2deg) scaleX(1.06);
+      margin-block: 4px;
+    }
+    .cf-marquee-track {
+      display: flex;
+      width: max-content;
+      animation: cf-marquee 38s linear infinite;
+    }
+    @keyframes cf-marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .cf-marquee-item {
+      display: flex; align-items: center; gap: 36px; padding: 0 36px;
+      font-size: 10.5px; font-weight: 700; letter-spacing: .2em;
+      text-transform: uppercase; color: rgba(255,255,255,.28); white-space: nowrap;
+    }
+    .cf-marquee-dot { color: var(--green); font-size: 7px; }
+
+    /* Nav columns */
+    .cf-nav-area { position: relative; z-index: 2; padding: 60px 0 44px; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .footer-top {
+      display: grid; gap: 40px; grid-template-columns: 1fr; margin-bottom: 0;
+    }
+    @media (min-width: 640px)  { .footer-top { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .footer-top { grid-template-columns: 1.4fr 1fr 1fr 1fr; } }
     .footer-brand .logo img { height: 30px; margin-bottom: 14px; }
     .footer-brand p { font-size: 13px; line-height: 1.65; max-width: 220px; }
-
     .footer-col-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--white);
-      letter-spacing: .04em;
-      text-transform: uppercase;
-      margin-bottom: 16px;
+      font-size: 12px; font-weight: 700; color: var(--white);
+      letter-spacing: .06em; text-transform: uppercase; margin-bottom: 14px;
     }
     .footer-col ul { display: flex; flex-direction: column; gap: 10px; }
-    .footer-col ul li a {
-      font-size: 13px;
-      color: rgba(255,255,255,.5);
-      transition: color .15s;
-    }
+    .footer-col ul li a { font-size: 13px; color: rgba(255,255,255,.45); transition: color .15s; }
     .footer-col ul li a:hover { color: var(--white); }
-
-    .footer-bottom {
-      border-top: 1px solid rgba(255,255,255,.07);
-      padding-top: 24px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px 20px;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .footer-bottom p { font-size: 12px; color: rgba(255,255,255,.38); }
-    @media (min-width: 768px) { .footer-bottom p br { display: none; } }
-    .footer-legal { display: flex; gap: 20px; }
-    .footer-legal a { font-size: 12px; color: rgba(255,255,255,.4); transition: color .15s; }
-    .footer-legal a:hover { color: var(--white); }
     .ig-link {
       display: inline-flex; align-items: center; gap: 8px;
       font-size: 13px; color: rgba(255,255,255,.6);
-      background: rgba(255,255,255,.07);
-      border-radius: 50px;
-      padding: 6px 14px 6px 10px;
-      transition: background .15s;
+      background: rgba(255,255,255,.07); border-radius: 50px;
+      padding: 6px 14px 6px 10px; transition: background .15s;
     }
     .ig-link:hover { background: rgba(255,255,255,.12); color: var(--white); }
     .ig-link svg { width: 16px; height: 16px; }
+
+    /* CTA area */
+    .cf-cta-area { position: relative; z-index: 2; padding: 80px 0 60px; text-align: center; }
+    .cf-heading {
+      font-size: clamp(2.2rem, 5.5vw, 4.8rem);
+      font-weight: 900; letter-spacing: -.04em; line-height: 1.06; margin-bottom: 48px;
+      background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,.48) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 28px rgba(174,255,34,.12));
+    }
+
+    /* Glass pills */
+    .cf-pills-primary  { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-bottom: 14px; }
+    .cf-pills-secondary { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+    .cf-pill {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 16px 32px; border-radius: 50px;
+      font-size: 15px; font-weight: 700; color: rgba(255,255,255,.8);
+      background: linear-gradient(145deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.03) 100%);
+      border: 1px solid rgba(255,255,255,.11);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,.55), inset 0 1px 1px rgba(255,255,255,.08);
+      transition: all .4s cubic-bezier(.16,1,.3,1);
+      text-decoration: none; cursor: pointer;
+      transform-style: preserve-3d; will-change: transform;
+    }
+    .cf-pill:hover {
+      background: linear-gradient(145deg, rgba(255,255,255,.14) 0%, rgba(255,255,255,.06) 100%);
+      border-color: rgba(255,255,255,.24); color: #fff;
+      box-shadow: 0 20px 44px -10px rgba(0,0,0,.65), inset 0 1px 1px rgba(255,255,255,.14);
+    }
+    .cf-pill-sm {
+      padding: 10px 22px; font-size: 12px; font-weight: 600;
+      color: rgba(255,255,255,.38);
+    }
+    .cf-pill-sm:hover { color: rgba(255,255,255,.75); }
+
+    /* Bottom bar */
+    .cf-bottom {
+      position: relative; z-index: 2;
+      display: flex; flex-wrap: wrap; align-items: center;
+      justify-content: space-between; gap: 14px 24px;
+      padding: 22px 0 36px;
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+    .cf-bottom-copy { font-size: 11px; color: rgba(255,255,255,.28); letter-spacing: .04em; text-transform: uppercase; }
+    .cf-bottom-credit { font-size: 11px; color: rgba(255,255,255,.2); }
+    .cf-bottom-credit a { color: rgba(255,255,255,.38); text-decoration: underline; text-underline-offset: 3px; transition: color .15s; }
+    .cf-bottom-credit a:hover { color: rgba(255,255,255,.8); }
+    .cf-back-top {
+      width: 42px; height: 42px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+      backdrop-filter: blur(8px); color: rgba(255,255,255,.45); cursor: pointer;
+      transition: background .25s, border-color .25s, color .25s;
+    }
+    .cf-back-top:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22); color: #fff; }
+    .cf-back-top svg { transition: transform .3s var(--ease); }
+    .cf-back-top:hover svg { transform: translateY(-3px); }
+
+    @media (max-width: 767px) {
+      .cf-cta-area { padding: 52px 0 44px; }
+      .cf-bottom { flex-direction: column; align-items: flex-start; gap: 10px; padding-bottom: 48px; }
+      .cf-nav-area { padding: 40px 0 36px; }
+      .footer-top { gap: 28px; }
+    }
 
     /* ── MOBILE OVERRIDES ───────────────────────────────────────────────── */
     @media (max-width: 767px) {
@@ -1001,13 +1112,8 @@
       .ls-number { font-size: 22px; }
       .nqn-map svg { max-width: 260px; }
 
-      /* download */
-      .download-btns { flex-direction: column; align-items: center; }
-      .store-btn { width: 100%; max-width: 260px; justify-content: center; }
-
       /* footer */
-      .footer-inner { padding-block: 40px 24px; }
-      .footer-top { gap: 28px; margin-bottom: 32px; }
+      .footer-top { gap: 24px; }
 
       /* section header */
       .section-header { margin-bottom: 32px; }
@@ -1591,48 +1697,43 @@
   </div>
 </section>
 
-<!-- ══ DESCARGA ════════════════════════════════════════════════════════════ -->
-<section class="section download-section" id="descarga" aria-labelledby="download-title">
-  <div class="container">
-    <div class="download-inner">
-      <span class="section-label reveal" style="color: var(--green);">Disponible gratis</span>
-      <h2 class="section-title reveal reveal-delay-1" id="download-title" style="max-width: 600px; margin-inline: auto; margin-bottom: 14px;">
-        Empezá a usar CalfPay hoy.
-      </h2>
-      <p class="section-sub reveal reveal-delay-2" style="margin-inline: auto;">
-        Descargá la app, abrí tu cuenta y empezá a manejar tu plata de una forma más simple.
-      </p>
-      <div class="download-btns reveal reveal-delay-3">
-        <!-- App Store -->
-        <a href="#" class="store-btn" aria-label="Descargar en App Store">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-          <div style="text-align: left;">
-            <div style="font-size: 10px; opacity: .7; font-weight: 400;">Descargá en</div>
-            <div>App Store</div>
-          </div>
-        </a>
-        <!-- Google Play -->
-        <a href="#" class="store-btn" aria-label="Descargar en Google Play">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.18 23.76c.3.17.64.24.99.19l12.48-7.34-2.79-2.79-10.68 9.94zM.58 1.1C.22 1.47 0 2.05 0 2.8v18.4c0 .75.22 1.33.58 1.7l.09.08 10.31-10.31v-.24L.67 1.02.58 1.1zM20.35 10.68l-2.92-1.72-3.1 3.1 3.1 3.1 2.95-1.73c.84-.49.84-1.3-.03-1.75zM3.18.24L15.66 7.58l-2.79 2.79L2.19.43c.29-.19.66-.25.99-.19z"/></svg>
-          <div style="text-align: left;">
-            <div style="font-size: 10px; opacity: .7; font-weight: 400;">Disponible en</div>
-            <div>Google Play</div>
-          </div>
-        </a>
+<!-- ══ CINEMATIC FOOTER ════════════════════════════════════════════════════ -->
+<footer class="cf-footer" role="contentinfo" id="descarga" aria-label="CalfPay footer">
+
+  <!-- Decorative BG layers -->
+  <div class="cf-grid"   aria-hidden="true"></div>
+  <div class="cf-aurora" aria-hidden="true"></div>
+  <div class="cf-giant-text" aria-hidden="true">CALFPAY</div>
+
+  <!-- Diagonal marquee -->
+  <div class="cf-marquee-wrap" aria-hidden="true">
+    <div class="cf-marquee-track">
+      <div class="cf-marquee-item">
+        La billetera de Neuquén <span class="cf-marquee-dot">✦</span>
+        Tarjeta Mastercard prepaga <span class="cf-marquee-dot">✦</span>
+        Pagos al instante <span class="cf-marquee-dot">✦</span>
+        Tu plata rinde <span class="cf-marquee-dot">✦</span>
+        Para personas y comercios <span class="cf-marquee-dot">✦</span>
+        MODO Neuquino <span class="cf-marquee-dot">✦</span>
+      </div>
+      <div class="cf-marquee-item">
+        La billetera de Neuquén <span class="cf-marquee-dot">✦</span>
+        Tarjeta Mastercard prepaga <span class="cf-marquee-dot">✦</span>
+        Pagos al instante <span class="cf-marquee-dot">✦</span>
+        Tu plata rinde <span class="cf-marquee-dot">✦</span>
+        Para personas y comercios <span class="cf-marquee-dot">✦</span>
+        MODO Neuquino <span class="cf-marquee-dot">✦</span>
       </div>
     </div>
   </div>
-</section>
 
-<!-- ══ FOOTER ═════════════════════════════════════════════════════════════ -->
-<footer class="footer" role="contentinfo" id="ayuda">
   <div class="container">
-    <div class="footer-inner">
+
+    <!-- Nav columns -->
+    <div class="cf-nav-area" id="ayuda">
       <div class="footer-top">
         <div class="footer-brand">
-          <div class="logo">
-            <img src="https://calfpay.ar/wp-content/uploads/2025/03/Calfpay-Color.png" alt="CalfPay" />
-          </div>
+          <div class="logo"><img src="https://calfpay.ar/wp-content/uploads/2025/03/Calfpay-Color.png" alt="CalfPay" /></div>
           <p>La billetera digital de Neuquén. Pagá, transferí, cobrá y hacé rendir tu plata desde una sola app.</p>
         </div>
         <div class="footer-col">
@@ -1664,7 +1765,7 @@
             <li><a href="#">Comisiones y cargos</a></li>
             <li><a href="#">Logo oficial</a></li>
           </ul>
-          <div style="margin-top: 20px;">
+          <div style="margin-top:20px">
             <div class="footer-col-title">Redes</div>
             <a href="https://instagram.com/calfpay" target="_blank" rel="noopener noreferrer" class="ig-link" aria-label="CalfPay en Instagram">
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
@@ -1673,19 +1774,45 @@
           </div>
         </div>
       </div>
-      <div class="footer-bottom">
-        <p style="color:rgba(255,255,255,.38);">© 2026 CalfPay.<br>Todos los derechos reservados.<br><span class="divider-dot" aria-hidden="true"></span> Neuquén, Argentina.</p>
-        <p style="font-size:11px;color:rgba(255,255,255,.25);">Rediseño por <a href="https://www.linkedin.com/in/mausa10" target="_blank" rel="noopener" style="color:rgba(255,255,255,.45);text-decoration:underline;text-underline-offset:3px;transition:color .15s;" onmouseover="this.style.color='rgba(255,255,255,.85)'" onmouseout="this.style.color='rgba(255,255,255,.45)'">Mauricio Sawicki</a></p>
-        <div class="footer-legal">
-          <a href="#">Privacidad</a>
-          <a href="#">Términos</a>
-          <a href="#">Cookies</a>
+    </div>
+
+    <!-- Cinematic CTA -->
+    <div class="cf-cta-area">
+      <h2 class="cf-heading" id="cf-heading">Empezá a usar<br>CalfPay hoy.</h2>
+      <div id="cf-links">
+        <div class="cf-pills-primary">
+          <a href="#" class="cf-pill cf-magnetic" aria-label="Descargar en App Store">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            App Store
+          </a>
+          <a href="#" class="cf-pill cf-magnetic" aria-label="Descargar en Google Play">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.18 23.76c.3.17.64.24.99.19l12.48-7.34-2.79-2.79-10.68 9.94zM.58 1.1C.22 1.47 0 2.05 0 2.8v18.4c0 .75.22 1.33.58 1.7l.09.08 10.31-10.31v-.24L.67 1.02.58 1.1zM20.35 10.68l-2.92-1.72-3.1 3.1 3.1 3.1 2.95-1.73c.84-.49.84-1.3-.03-1.75zM3.18.24L15.66 7.58l-2.79 2.79L2.19.43c.29-.19.66-.25.99-.19z"/></svg>
+            Google Play
+          </a>
+        </div>
+        <div class="cf-pills-secondary">
+          <a href="#" class="cf-pill cf-pill-sm cf-magnetic">Privacidad</a>
+          <a href="#" class="cf-pill cf-pill-sm cf-magnetic">Términos</a>
+          <a href="#" class="cf-pill cf-pill-sm cf-magnetic">Ayuda</a>
+          <a href="#" class="cf-pill cf-pill-sm cf-magnetic">Cookies</a>
         </div>
       </div>
     </div>
+
+    <!-- Bottom bar -->
+    <div class="cf-bottom">
+      <p class="cf-bottom-copy">© 2026 CalfPay · Neuquén, Argentina · Todos los derechos reservados.</p>
+      <p class="cf-bottom-credit">Rediseño por <a href="https://www.linkedin.com/in/mausa10" target="_blank" rel="noopener">Mauricio Sawicki</a></p>
+      <button class="cf-back-top cf-magnetic" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver al inicio">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 15l7-7 7 7"/></svg>
+      </button>
+    </div>
+
   </div>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
   // ── TNA config (editar aquí) ──────────────────────────────────────────
   const TNA = 45;
@@ -1850,6 +1977,41 @@
       if (hint) hint.style.opacity = scrolled > 80 ? '0' : '1';
     }, { passive: true });
   })();
+
+  // ── CINEMATIC FOOTER — GSAP ScrollTrigger + Magnetic buttons ─────────────
+  (function() {
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.fromTo('.cf-giant-text',
+      { y: '8vh', scale: 0.84, opacity: 0 },
+      { y: '0vh', scale: 1, opacity: 1, ease: 'power1.out',
+        scrollTrigger: { trigger: '.cf-footer', start: 'top 85%', end: 'bottom bottom', scrub: 1.8 } }
+    );
+
+    gsap.fromTo(['#cf-heading', '#cf-links'],
+      { y: 44, opacity: 0 },
+      { y: 0, opacity: 1, stagger: 0.14, ease: 'power3.out',
+        scrollTrigger: { trigger: '.cf-cta-area', start: 'top 75%', end: 'center 55%', scrub: 1 } }
+    );
+  })();
+
+  // Magnetic effect for cf-magnetic elements
+  document.querySelectorAll('.cf-magnetic').forEach(el => {
+    el.addEventListener('mousemove', e => {
+      const r = el.getBoundingClientRect();
+      const x = e.clientX - r.left - r.width  / 2;
+      const y = e.clientY - r.top  - r.height / 2;
+      if (typeof gsap !== 'undefined') {
+        gsap.to(el, { x: x * 0.36, y: y * 0.36, rotationX: -y * 0.1, rotationY: x * 0.1, scale: 1.04, ease: 'power2.out', duration: 0.38 });
+      }
+    });
+    el.addEventListener('mouseleave', () => {
+      if (typeof gsap !== 'undefined') {
+        gsap.to(el, { x: 0, y: 0, rotationX: 0, rotationY: 0, scale: 1, ease: 'elastic.out(1,0.3)', duration: 1.15 });
+      }
+    });
+  });
 
   // ── BENTO SPOTLIGHT ───────────────────────────────────────────────────────
   document.querySelectorAll('.bento-card').forEach(card => {
