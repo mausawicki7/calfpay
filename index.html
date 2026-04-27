@@ -467,10 +467,29 @@
       flex-direction: column;
       justify-content: space-between;
       min-height: 180px;
-      transition: transform .22s var(--ease), box-shadow .22s var(--ease);
+      transition: transform .25s var(--ease), box-shadow .25s var(--ease), border-color .25s;
     }
     @media (min-width: 768px) { .bento-card { border-radius: 24px; padding: 32px; min-height: 220px; } }
-    .bento-card:hover { transform: translateY(-4px); }
+    .bento-card:hover { transform: translateY(-5px); }
+    .bc-dark:hover, .bc-mid:hover {
+      border-color: rgba(255,255,255,.22);
+      box-shadow: 0 24px 64px rgba(0,0,0,.45);
+    }
+    .bc-green:hover  { box-shadow: 0 24px 64px rgba(174,255,34,.28); }
+    .bc-teal:hover   { box-shadow: 0 24px 64px rgba(0,165,187,.28); }
+
+    /* spotlight overlay — filled via JS */
+    .bc-spotlight {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity .35s;
+      z-index: 0;
+    }
+    /* keep card content above spotlight */
+    .bento-card > *:not(.bc-spotlight) { position: relative; z-index: 1; }
 
     /* variants */
     .bc-dark   { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); }
@@ -1831,6 +1850,27 @@
       if (hint) hint.style.opacity = scrolled > 80 ? '0' : '1';
     }, { passive: true });
   })();
+
+  // ── BENTO SPOTLIGHT ───────────────────────────────────────────────────────
+  document.querySelectorAll('.bento-card').forEach(card => {
+    const el = document.createElement('div');
+    el.className = 'bc-spotlight';
+    card.prepend(el);
+
+    const color = card.classList.contains('bc-green') ? 'rgba(0,0,0,0.14)'
+                : card.classList.contains('bc-teal')  ? 'rgba(255,255,255,0.13)'
+                :                                       'rgba(255,255,255,0.09)';
+
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
+      el.style.background = `radial-gradient(520px circle at ${x}px ${y}px, ${color}, transparent 40%)`;
+      el.style.opacity = '1';
+    });
+
+    card.addEventListener('mouseleave', () => { el.style.opacity = '0'; });
+  });
 
 </script>
 </body>
