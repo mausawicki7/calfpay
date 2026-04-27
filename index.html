@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CalfPay — La billetera de Neuquén</title>
+  <meta name="description" content="Pagá, transferí, cobrá, pedí tu tarjeta prepaga Mastercard y manejá tu plata desde una billetera digital hecha para vos." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── TOKENS ─────────────────────────────────────────────────────────── */
+    :root {
+      --green:   #AEFF22;
+      --teal:    #00A5BB;
+      --bg:      #F5F5F5;
+      --white:   #FFFFFF;
+      --black:   #000000;
+      --gray:    #878787;
+      --blue:    #007AFF;
+      --dark:    #0D0D0D;
+
+      --r-card:  28px;
+      --r-btn:   50px;
+      --r-chip:  14px;
+
+      --shadow:  0 4px 24px rgba(0,0,0,.07);
+      --shadow-md: 0 8px 40px rgba(0,0,0,.12);
+
+      --font: 'Space Grotesk', 'Nohemi', system-ui, sans-serif;
+      --ease: cubic-bezier(.22,1,.36,1);
+    }
+
+    /* ── RESET ──────────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    html::-webkit-scrollbar { display: none; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--black);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    img { max-width: 100%; display: block; }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* ── UTILITY ────────────────────────────────────────────────────────── */
+    .container {
+      width: 100%;
+      max-width: 1180px;
+      margin-inline: auto;
+      padding-inline: 20px;
+    }
+    .section { padding-block: 56px; }
+    @media (min-width: 768px) { .section { padding-block: 120px; } }
+
+    /* ── SCROLL REVEAL ──────────────────────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity .6s var(--ease), transform .6s var(--ease);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-delay-1 { transition-delay: .1s; }
+    .reveal-delay-2 { transition-delay: .2s; }
+    .reveal-delay-3 { transition-delay: .3s; }
+    .reveal-delay-4 { transition-delay: .4s; }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
+
+    /* ── BUTTONS ────────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: var(--r-btn);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -.01em;
+      transition: transform .15s var(--ease), box-shadow .15s var(--ease), opacity .15s;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-primary {
+      background: var(--green);
+      color: var(--black);
+      box-shadow: 0 4px 20px rgba(174,255,34,.35);
+    }
+    .btn-primary:hover { box-shadow: 0 6px 28px rgba(174,255,34,.5); transform: translateY(-1px); }
+    .btn-outline {
+      background: transparent;
+      color: var(--black);
+      border: 2px solid var(--black);
+    }
+    .btn-outline:hover { background: var(--black); color: var(--white); }
+    .btn-outline-white {
+      background: transparent;
+      color: var(--white);
+      border: 2px solid rgba(255,255,255,.4);
+    }
+    .btn-outline-white:hover { background: rgba(255,255,255,.1); }
+    .btn-teal {
+      background: var(--teal);
+      color: var(--white);
+    }
+    .btn-teal:hover { opacity: .9; transform: translateY(-1px); }
+
+    /* ── HEADER ─────────────────────────────────────────────────────────── */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(245,245,245,.72);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+    }
+    .logo img { height: 36px; width: auto; }
+    .nav { display: flex; align-items: center; gap: 8px; }
+    .nav-link {
+      padding: 8px 14px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--black);
+      border-radius: 10px;
+      transition: background .15s;
+    }
+    .nav-link:hover { background: rgba(0,0,0,.06); }
+    .header-cta { margin-left: 12px; padding: 10px 22px; font-size: 14px; }
+
+    /* hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      padding: 8px;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--black);
+      border-radius: 2px;
+      transition: transform .25s, opacity .25s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-nav {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      padding: 12px 20px 20px;
+      border-top: 1px solid rgba(0,0,0,.06);
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav .nav-link { font-size: 16px; padding: 12px 16px; }
+    .mobile-nav .btn { margin-top: 8px; justify-content: center; }
+
+    @media (max-width: 767px) {
+      .nav, .header-cta { display: none; }
+      .hamburger { display: flex; }
+    }
+
+    /* ── HERO ───────────────────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding-block: 80px 60px;
+      background: var(--bg);
+    }
+    @media (min-width: 768px) { .hero { padding-block: 100px 80px; } }
+
+    /* blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .blob-green {
+      width: 480px; height: 480px;
+      background: rgba(174,255,34,.22);
+      top: -120px; right: -80px;
+    }
+    .blob-teal {
+      width: 320px; height: 320px;
+      background: rgba(0,165,187,.18);
+      bottom: -60px; left: -60px;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 36px;
+      align-items: center;
+    }
+    @media (min-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr 1fr; gap: 40px; }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--white);
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 50px;
+      padding: 6px 14px 6px 8px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+    .hero-badge-dot {
+      width: 22px; height: 22px;
+      background: var(--green);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .hero-badge-dot svg { width: 12px; height: 12px; }
+
+    .hero-title {
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -.03em;
+      margin-bottom: 20px;
+    }
+    .hero-title .highlight {
+      position: relative;
+      display: inline-block;
+    }
+    .hero-title .highlight::after {
+      content: '';
+      position: absolute;
+      left: 0; bottom: 2px;
+      width: 100%; height: 8px;
+      background: var(--green);
+      z-index: -1;
+      border-radius: 4px;
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      color: #444;
+      line-height: 1.65;
+      max-width: 500px;
+      margin-bottom: 36px;
+    }
+    .hero-btns { display: flex; flex-wrap: wrap; gap: 12px; }
+
+    /* hero visual */
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      width: 100%;
+    }
+    .hero-app-img {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0 auto;
+      border-radius: 32px;
+      filter: drop-shadow(0 32px 64px rgba(0,0,0,.18));
+      animation: floatCard 5s ease-in-out infinite;
+    }
+    @media (max-width: 899px) {
+      .hero { padding-block: 48px 40px; }
+      .hero-content { text-align: center; }
+      .hero-sub { max-width: 100%; margin-inline: auto; }
+      .hero-btns { justify-content: center; }
+      .hero-badge { margin-inline: auto; }
+      .hero-visual { margin-top: 8px; }
+      .hero-app-img { max-width: min(100%, 420px); border-radius: 24px; margin: 0 auto; }
+    }
+    .phone-wrap {
+      position: relative;
+      width: 260px;
+      flex-shrink: 0;
+    }
+    .phone {
+      width: 100%;
+      background: var(--dark);
+      border-radius: 40px;
+      padding: 14px 10px;
+      box-shadow: 0 32px 80px rgba(0,0,0,.32), 0 0 0 1px rgba(255,255,255,.08);
+      position: relative;
+      overflow: hidden;
+    }
+    .phone-notch {
+      width: 90px; height: 24px;
+      background: var(--dark);
+      border-radius: 0 0 16px 16px;
+      margin: 0 auto 10px;
+      position: relative;
+      z-index: 2;
+    }
+    .phone-screen {
+      background: linear-gradient(145deg, #0D1F0D 0%, #002933 100%);
+      border-radius: 28px;
+      padding: 20px 16px;
+      min-height: 440px;
+      position: relative;
+      overflow: hidden;
+    }
+    .phone-screen::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 180px; height: 180px;
+      background: radial-gradient(circle, rgba(174,255,34,.25) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .phone-screen::after {
+      content: '';
+      position: absolute;
+      bottom: -30px; left: -30px;
+      width: 140px; height: 140px;
+      background: radial-gradient(circle, rgba(0,165,187,.2) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .ps-greeting { font-size: 11px; color: rgba(255,255,255,.5); margin-bottom: 4px; }
+    .ps-name { font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 20px; }
+    .ps-balance-label { font-size: 10px; color: rgba(255,255,255,.45); margin-bottom: 4px; }
+    .ps-balance {
+      font-size: 28px; font-weight: 700; color: var(--white);
+      margin-bottom: 6px; letter-spacing: -.02em;
+    }
+    .ps-tna {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(174,255,34,.15);
+      border: 1px solid rgba(174,255,34,.3);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 11px; font-weight: 600; color: var(--green);
+      margin-bottom: 20px;
+    }
+    .ps-actions {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 8px; margin-bottom: 20px;
+    }
+    .ps-action {
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+    }
+    .ps-action-icon {
+      width: 38px; height: 38px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.1);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ps-action-icon svg { width: 18px; height: 18px; color: var(--white); }
+    .ps-action span { font-size: 9px; color: rgba(255,255,255,.5); text-align: center; }
+    .ps-movements { font-size: 10px; color: rgba(255,255,255,.4); margin-bottom: 10px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+    .ps-mov-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .ps-mov-left { display: flex; align-items: center; gap: 8px; }
+    .ps-mov-dot { width: 28px; height: 28px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+    .ps-mov-dot.green { background: rgba(174,255,34,.2); }
+    .ps-mov-dot.teal  { background: rgba(0,165,187,.2); }
+    .ps-mov-name { font-size: 11px; color: rgba(255,255,255,.8); font-weight: 500; }
+    .ps-mov-date { font-size: 9px; color: rgba(255,255,255,.35); }
+    .ps-mov-amount { font-size: 11px; font-weight: 600; }
+    .ps-mov-amount.pos { color: var(--green); }
+    .ps-mov-amount.neg { color: rgba(255,255,255,.6); }
+
+    /* floating card */
+    .floating-card {
+      position: absolute;
+      right: -40px;
+      bottom: 60px;
+      width: 160px;
+      animation: floatCard 4s ease-in-out infinite;
+    }
+    @keyframes floatCard {
+      0%, 100% { transform: translateY(0) rotate(6deg); }
+      50%       { transform: translateY(-10px) rotate(6deg); }
+    }
+
+    /* credit card */
+    .credit-card {
+      background: linear-gradient(135deg, #0a1a0a 0%, #0D2B30 50%, #001a1f 100%);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.08);
+      position: relative;
+      overflow: hidden;
+    }
+    .credit-card::before {
+      content: '';
+      position: absolute;
+      top: -20px; right: -20px;
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: rgba(174,255,34,.12);
+    }
+    .cc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .cc-logo { font-size: 11px; font-weight: 700; color: var(--green); letter-spacing: .02em; }
+    .cc-chip {
+      width: 22px; height: 16px; border-radius: 4px;
+      background: linear-gradient(135deg, #d4af37, #f0c040);
+    }
+    .cc-number { font-size: 9px; color: rgba(255,255,255,.5); letter-spacing: .12em; margin-bottom: 8px; }
+    .cc-name { font-size: 8px; color: rgba(255,255,255,.7); font-weight: 600; margin-bottom: 4px; text-transform: uppercase; }
+    .cc-bottom { display: flex; justify-content: space-between; align-items: center; }
+    .cc-mc { display: flex; }
+    .cc-mc-c1 { width: 18px; height: 18px; border-radius: 50%; background: #EB001B; opacity: .9; }
+    .cc-mc-c2 { width: 18px; height: 18px; border-radius: 50%; background: #F79E1B; opacity: .9; margin-left: -8px; }
+    .cc-prepago { font-size: 7px; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .06em; }
+
+    /* ── BENTO SECTION ───────────────────────────────────────────────────── */
+    .bento-section {
+      background: #080A0D;
+      padding-block: 56px;
+    }
+    @media (min-width: 768px) { .bento-section { padding-block: 120px; } }
+
+    .bento-header { margin-bottom: 52px; }
+    .bento-header .section-label { color: var(--green); }
+    .bento-header .section-title { color: var(--white); max-width: 600px; }
+
+    .bento-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 768px) { .bento-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
+    @media (min-width: 1024px) {
+      .bento-grid { grid-template-columns: repeat(3, 1fr); }
+      .bento-wide { grid-column: span 2; }
+    }
+
+    .bento-card {
+      border-radius: 20px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 180px;
+      transition: transform .22s var(--ease), box-shadow .22s var(--ease);
+    }
+    @media (min-width: 768px) { .bento-card { border-radius: 24px; padding: 32px; min-height: 220px; } }
+    .bento-card:hover { transform: translateY(-4px); }
+
+    /* variants */
+    .bc-dark   { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); }
+    .bc-mid    { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.09); }
+    .bc-green  { background: var(--green); }
+    .bc-teal   { background: var(--teal); }
+
+    /* glow orbs per variant */
+    .bc-dark::after, .bc-mid::after {
+      content: '';
+      position: absolute;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      pointer-events: none;
+      top: -80px; right: -80px;
+      background: radial-gradient(circle, rgba(174,255,34,.06) 0%, transparent 70%);
+    }
+    .bc-teal::after {
+      content: '';
+      position: absolute;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      pointer-events: none;
+      top: -60px; right: -60px;
+      background: radial-gradient(circle, rgba(255,255,255,.12) 0%, transparent 70%);
+    }
+    .bc-green::after {
+      content: '';
+      position: absolute;
+      width: 240px; height: 240px;
+      border-radius: 50%;
+      pointer-events: none;
+      bottom: -80px; left: -60px;
+      background: radial-gradient(circle, rgba(255,255,255,.14) 0%, transparent 70%);
+    }
+
+    /* card typography */
+    .bc-label {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .bc-dark .bc-label, .bc-mid .bc-label { color: rgba(255,255,255,.35); }
+    .bc-green .bc-label { color: rgba(0,0,0,.45); }
+    .bc-teal  .bc-label { color: rgba(255,255,255,.55); }
+
+    .bc-title {
+      font-size: 19px; font-weight: 700;
+      line-height: 1.25; letter-spacing: -.015em;
+      margin-bottom: 8px;
+    }
+    .bc-dark .bc-title, .bc-mid .bc-title { color: var(--white); }
+    .bc-green .bc-title { color: #000; }
+    .bc-teal  .bc-title { color: var(--white); }
+
+    .bc-desc { font-size: 13.5px; line-height: 1.55; }
+    .bc-dark .bc-desc, .bc-mid .bc-desc { color: rgba(255,255,255,.42); }
+    .bc-green .bc-desc { color: rgba(0,0,0,.58); }
+    .bc-teal  .bc-desc { color: rgba(255,255,255,.68); }
+
+    /* icon */
+    .bc-icon {
+      width: 46px; height: 46px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px; flex-shrink: 0;
+    }
+    .bc-dark .bc-icon, .bc-mid .bc-icon {
+      background: rgba(174,255,34,.1);
+      border: 1px solid rgba(174,255,34,.18);
+    }
+    .bc-green .bc-icon { background: rgba(0,0,0,.12); }
+    .bc-teal  .bc-icon { background: rgba(255,255,255,.18); }
+
+    .bc-dark .bc-icon svg, .bc-mid .bc-icon svg { color: var(--green); width: 22px; height: 22px; }
+    .bc-green .bc-icon svg { color: #000; width: 22px; height: 22px; }
+    .bc-teal  .bc-icon svg { color: #fff; width: 22px; height: 22px; }
+
+    /* card image on mastercard card */
+    .bc-card-img {
+      position: absolute;
+      right: -12px; bottom: -12px;
+      width: 52%; max-width: 260px;
+      transform: rotate(8deg);
+      opacity: .92;
+      pointer-events: none;
+      filter: drop-shadow(0 24px 40px rgba(0,0,0,.5));
+    }
+
+    /* TNA big number */
+    .bc-tna-num {
+      font-size: clamp(3.5rem, 12vw, 5rem);
+      font-weight: 700; letter-spacing: -.04em; line-height: 1;
+      color: var(--white); margin-bottom: 2px;
+    }
+    .bc-tna-unit {
+      font-size: 13px; font-weight: 700;
+      color: rgba(255,255,255,.5); letter-spacing: .08em;
+      text-transform: uppercase; margin-bottom: 20px;
+    }
+
+    /* pill tag */
+    .bc-pill {
+      display: inline-flex; align-items: center;
+      background: rgba(0,0,0,.14); border-radius: 50px;
+      padding: 6px 14px; font-size: 12px; font-weight: 700;
+      letter-spacing: .03em; color: rgba(0,0,0,.65);
+      margin-top: 20px; align-self: flex-start;
+    }
+    .bc-pill-white {
+      background: rgba(255,255,255,.15); color: rgba(255,255,255,.85);
+    }
+
+    /* ── SECTION HEADER ─────────────────────────────────────────────────── */
+    .section-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -.025em;
+      margin-bottom: 14px;
+    }
+    .section-sub {
+      font-size: clamp(.95rem, 1.5vw, 1.05rem);
+      color: #555;
+      line-height: 1.7;
+      max-width: 560px;
+    }
+    .section-header { margin-bottom: 48px; }
+    .section-header.center { text-align: center; }
+    .section-header.center .section-sub { margin-inline: auto; }
+
+
+    /* ── TARJETA ────────────────────────────────────────────────────────── */
+    .card-section {
+      background: linear-gradient(135deg, #050f05 0%, #021218 100%);
+      color: var(--white);
+      overflow: hidden;
+      position: relative;
+    }
+    .card-section::before {
+      content: '';
+      position: absolute;
+      top: -100px; left: -100px;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(174,255,34,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .card-section::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; right: -80px;
+      width: 320px; height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,165,187,.14) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .card-inner {
+      display: grid;
+      gap: 60px;
+      align-items: center;
+    }
+    @media (min-width: 900px) {
+      .card-inner { grid-template-columns: 1fr 1fr; }
+    }
+
+    .card-section .section-label { color: var(--green); }
+    .card-section .section-title { color: var(--white); }
+    .card-section .section-sub { color: rgba(255,255,255,.6); }
+
+    /* big card */
+    .big-card-wrap { display: flex; justify-content: center; }
+    .real-card-img {
+      width: 100%;
+      max-width: 380px;
+      border-radius: 20px;
+      animation: floatCard 5s ease-in-out infinite;
+      filter: drop-shadow(0 40px 60px rgba(0,0,0,.5));
+      display: block;
+      margin: 0 auto;
+    }
+    @media (max-width: 899px) {
+      .real-card-img { max-width: 280px; }
+      .card-inner { gap: 36px; }
+    }
+    .big-card {
+      width: 320px;
+      max-width: 100%;
+      background: linear-gradient(135deg, #0a2010 0%, #0a2530 60%, #050f05 100%);
+      border-radius: 24px;
+      padding: 28px 24px;
+      box-shadow: 0 40px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.07);
+      position: relative;
+      overflow: hidden;
+      animation: floatCard 5s ease-in-out infinite;
+    }
+    .big-card::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 180px; height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(174,255,34,.18), transparent 70%);
+    }
+    .bc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+    .bc-brand { font-size: 18px; font-weight: 800; color: var(--green); letter-spacing: .02em; }
+    .bc-chip {
+      width: 36px; height: 26px; border-radius: 6px;
+      background: linear-gradient(135deg, #c9a227, #f0d060);
+      position: relative; overflow: hidden;
+    }
+    .bc-chip::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 0; right: 0; height: 1px;
+      background: rgba(0,0,0,.15);
+    }
+    .bc-number {
+      font-size: 13px;
+      color: rgba(255,255,255,.55);
+      letter-spacing: .18em;
+      margin-bottom: 20px;
+      font-variant-numeric: tabular-nums;
+    }
+    .bc-info { display: flex; justify-content: space-between; align-items: flex-end; }
+    .bc-holder { font-size: 11px; color: rgba(255,255,255,.7); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+    .bc-mc { display: flex; }
+    .bc-mc-c1 { width: 32px; height: 32px; border-radius: 50%; background: #EB001B; }
+    .bc-mc-c2 { width: 32px; height: 32px; border-radius: 50%; background: #F79E1B; margin-left: -14px; }
+
+    /* ── RENDIMIENTO ────────────────────────────────────────────────────── */
+    .yield-section { background: var(--bg); }
+    .yield-inner {
+      display: grid;
+      gap: 60px;
+      align-items: center;
+    }
+    @media (min-width: 900px) {
+      .yield-inner { grid-template-columns: 1fr 1fr; }
+    }
+
+    .yield-widget {
+      background: var(--white);
+      border-radius: var(--r-card);
+      padding: 28px 20px;
+      box-shadow: var(--shadow-md);
+    }
+    @media (min-width: 768px) { .yield-widget { padding: 36px 32px; } }
+    .yield-widget {
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    @media (max-width: 767px) {
+      .yield-inner { gap: 36px; }
+      .yield-number { font-size: clamp(3.5rem, 18vw, 6rem); }
+    }
+    .yield-widget::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--green), var(--teal));
+    }
+    .yield-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 12px;
+    }
+    .yield-number {
+      font-size: clamp(4rem, 10vw, 7rem);
+      font-weight: 700;
+      letter-spacing: -.04em;
+      line-height: 1;
+      color: var(--black);
+      margin-bottom: 4px;
+    }
+    .yield-number span { color: var(--teal); }
+    .yield-unit {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--gray);
+      margin-bottom: 16px;
+    }
+    .yield-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(174,255,34,.15);
+      border: 1px solid rgba(174,255,34,.4);
+      border-radius: 50px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #2a6e00;
+    }
+
+    .yield-features { display: flex; flex-direction: column; gap: 20px; }
+    .yield-feature {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .yf-icon {
+      width: 44px; height: 44px;
+      border-radius: 14px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .yf-icon svg { width: 20px; height: 20px; color: var(--teal); }
+    .yf-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .yf-desc  { font-size: 13px; color: var(--gray); line-height: 1.5; }
+
+    /* ── COMERCIOS ──────────────────────────────────────────────────────── */
+    .comercios-section { background: var(--white); }
+    .comercio-grid { display: grid; gap: 16px; }
+    @media (min-width: 480px) { .comercio-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .comercio-grid { grid-template-columns: repeat(3, 1fr); } }
+
+    .comercio-card {
+      background: var(--bg);
+      border-radius: var(--r-card);
+      padding: 24px 22px;
+      border: 1px solid rgba(0,0,0,.05);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: transform .2s var(--ease), background .2s;
+    }
+    .comercio-card:hover { transform: translateY(-3px); background: #f0fff0; }
+    .cc-icon-wrap {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cc-icon-wrap svg { width: 20px; height: 20px; color: var(--green); filter: brightness(.7); }
+    .cc-card-title { font-size: 15px; font-weight: 700; }
+    .cc-card-desc  { font-size: 13px; color: var(--gray); line-height: 1.5; }
+
+    .comercios-cta { margin-top: 40px; display: flex; justify-content: center; }
+
+    /* ── LOCAL ──────────────────────────────────────────────────────────── */
+    .local-section {
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+    }
+    .local-inner {
+      display: grid;
+      gap: 60px;
+      align-items: center;
+    }
+    @media (min-width: 900px) {
+      .local-inner { grid-template-columns: 1fr 1fr; }
+    }
+
+    .nqn-map {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .nqn-map svg {
+      width: 100%;
+      max-width: 360px;
+      filter: drop-shadow(0 8px 32px rgba(0,165,187,.15));
+    }
+
+    .local-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 32px;
+    }
+    .local-stat {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 20px 18px;
+      box-shadow: var(--shadow);
+    }
+    .ls-number { font-size: 28px; font-weight: 700; color: var(--black); letter-spacing: -.02em; }
+    .ls-number span { color: var(--teal); }
+    .ls-label { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+    /* ── DOWNLOAD ───────────────────────────────────────────────────────── */
+    .download-section {
+      background: var(--dark);
+      color: var(--white);
+      position: relative;
+      overflow: hidden;
+    }
+    .download-section::before {
+      content: '';
+      position: absolute;
+      top: -120px; left: 50%;
+      transform: translateX(-50%);
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(174,255,34,.1) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .download-inner { position: relative; z-index: 1; text-align: center; }
+    .download-section .section-title { color: var(--white); }
+    .download-section .section-sub { color: rgba(255,255,255,.6); margin-inline: auto; }
+    .download-btns { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 36px; }
+
+    .store-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: var(--r-btn);
+      padding: 14px 24px;
+      color: var(--white);
+      font-size: 14px;
+      font-weight: 600;
+      transition: background .2s, border-color .2s;
+      cursor: pointer;
+    }
+    .store-btn:hover { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.3); }
+    .store-btn svg { width: 24px; height: 24px; flex-shrink: 0; }
+
+    /* ── FOOTER ─────────────────────────────────────────────────────────── */
+    .footer {
+      background: var(--dark);
+      color: rgba(255,255,255,.55);
+      border-top: 1px solid rgba(255,255,255,.07);
+    }
+    .footer-inner {
+      padding-block: 60px 32px;
+    }
+    .footer-top {
+      display: grid;
+      gap: 40px;
+      grid-template-columns: 1fr;
+      margin-bottom: 48px;
+    }
+    @media (min-width: 640px) { .footer-top { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .footer-top { grid-template-columns: 1.4fr 1fr 1fr 1fr; } }
+
+    .footer-brand .logo img { height: 30px; margin-bottom: 14px; }
+    .footer-brand p { font-size: 13px; line-height: 1.65; max-width: 220px; }
+
+    .footer-col-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .footer-col ul { display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul li a {
+      font-size: 13px;
+      color: rgba(255,255,255,.5);
+      transition: color .15s;
+    }
+    .footer-col ul li a:hover { color: var(--white); }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,.07);
+      padding-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 20px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-bottom p { font-size: 12px; color: rgba(255,255,255,.38); }
+    .footer-legal { display: flex; gap: 20px; }
+    .footer-legal a { font-size: 12px; color: rgba(255,255,255,.4); transition: color .15s; }
+    .footer-legal a:hover { color: var(--white); }
+    .ig-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; color: rgba(255,255,255,.6);
+      background: rgba(255,255,255,.07);
+      border-radius: 50px;
+      padding: 6px 14px 6px 10px;
+      transition: background .15s;
+    }
+    .ig-link:hover { background: rgba(255,255,255,.12); color: var(--white); }
+    .ig-link svg { width: 16px; height: 16px; }
+
+    /* ── MOBILE OVERRIDES ───────────────────────────────────────────────── */
+    @media (max-width: 767px) {
+      /* comercios */
+      .comercio-grid { grid-template-columns: 1fr; }
+      .comercios-cta { margin-top: 28px; }
+
+      /* local */
+      .local-inner { gap: 36px; }
+      .local-stats { gap: 10px; }
+      .ls-number { font-size: 22px; }
+      .nqn-map svg { max-width: 260px; }
+
+      /* download */
+      .download-btns { flex-direction: column; align-items: center; }
+      .store-btn { width: 100%; max-width: 260px; justify-content: center; }
+
+      /* footer */
+      .footer-inner { padding-block: 40px 24px; }
+      .footer-top { gap: 28px; margin-bottom: 32px; }
+
+      /* section header */
+      .section-header { margin-bottom: 32px; }
+      .section-title { letter-spacing: -.02em; }
+
+      /* card section */
+      .card-section .section-sub { font-size: .9rem; }
+    }
+
+    /* ── MISC ───────────────────────────────────────────────────────────── */
+    .divider-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      display: inline-block;
+      margin: 0 4px;
+    }
+
+    /* ── SCROLL PROGRESS BAR ─────────────────────────────────────────── */
+    .scroll-prog {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--green), var(--teal));
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    /* ── SCROLL ANIMATION SECTION ────────────────────────────────────── */
+    .scroll-anim-section { background: #000000; position: relative; }
+
+    .scroll-anim-intro {
+      padding: 48px 20px 0;
+      text-align: center;
+    }
+    @media (min-width: 768px) { .scroll-anim-intro { padding-top: 90px; } }
+    .scroll-anim-intro .section-label { color: var(--green); }
+    .scroll-anim-intro .section-title {
+      color: var(--white);
+      max-width: 580px;
+      margin-inline: auto;
+      margin-bottom: 12px;
+    }
+    .scroll-anim-intro .section-sub {
+      color: rgba(255,255,255,.5);
+      margin-inline: auto;
+    }
+
+    .scroll-anim-container { height: 180vh; position: relative; margin-top: 24px; }
+    @media (max-width: 767px) { .scroll-anim-container { margin-top: 16px; } }
+
+    .scroll-anim-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    /* On mobile portrait the video is square — match sticky height to width */
+    @media (max-width: 767px) {
+      .scroll-anim-sticky { height: 100vw; top: calc(50vh - 50vw); }
+    }
+
+    #app-canvas { position: absolute; top: 0; left: 0; }
+
+
+    /* scroll hint */
+    .scroll-hint {
+      position: absolute;
+      bottom: 4vh;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      z-index: 10;
+      transition: opacity .5s ease;
+    }
+    .scroll-hint-line {
+      width: 1px; height: 36px;
+      background: linear-gradient(180deg, rgba(174,255,34,.9), rgba(174,255,34,0));
+      animation: scrollPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%,100% { opacity:.3; transform: scaleY(.8); }
+      50% { opacity:1; transform: scaleY(1.1); }
+    }
+    .scroll-hint span {
+      font-size: 10px;
+      color: rgba(255,255,255,.35);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .scroll-anim-cta {
+      text-align: center;
+      padding: 40px 20px 60px;
+      background: #000000;
+    }
+    @media (max-width: 767px) { .scroll-anim-cta { padding: 28px 20px 48px; } }
+
+
+  </style>
+</head>
+<body>
+
+<div class="scroll-prog" aria-hidden="true"></div>
+
+<!-- ══ HEADER ════════════════════════════════════════════════════════════ -->
+<header class="header" role="banner">
+  <div class="container">
+    <div class="header-inner">
+      <a href="/" class="logo" aria-label="CalfPay inicio">
+        <img src="https://calfpay.ar/wp-content/uploads/2025/03/Calfpay-Color.png" alt="CalfPay" />
+      </a>
+      <nav class="nav" aria-label="Navegación principal">
+        <a href="#personas"  class="nav-link">Personas</a>
+        <a href="#comercios" class="nav-link">Comercios</a>
+        <a href="#beneficios" class="nav-link">Beneficios</a>
+        <a href="#ayuda"     class="nav-link">Ayuda</a>
+      </nav>
+      <a href="#descarga" class="btn btn-primary header-cta" aria-label="Descargar la app de CalfPay">Descargar app</a>
+      <button class="hamburger" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <nav class="mobile-nav" aria-label="Menú mobile">
+    <a href="#personas"   class="nav-link">Personas</a>
+    <a href="#comercios"  class="nav-link">Comercios</a>
+    <a href="#beneficios" class="nav-link">Beneficios</a>
+    <a href="#ayuda"      class="nav-link">Ayuda</a>
+    <a href="#descarga" class="btn btn-primary">Descargar app</a>
+  </nav>
+</header>
+
+<!-- ══ HERO ══════════════════════════════════════════════════════════════ -->
+<section class="hero" aria-labelledby="hero-title">
+  <div class="blob blob-green" aria-hidden="true"></div>
+  <div class="blob blob-teal"  aria-hidden="true"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge reveal">
+          <div class="hero-badge-dot" aria-hidden="true">
+            <svg viewBox="0 0 12 12" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg>
+          </div>
+          <span>La billetera de Neuquén</span>
+        </div>
+        <h1 class="hero-title reveal reveal-delay-1" id="hero-title">
+          Ahora tu plata también tiene <span class="highlight">MODO Neuquino.</span>
+        </h1>
+        <p class="hero-sub reveal reveal-delay-2">
+          Pagá, transferí, cobrá, pedí tu tarjeta prepaga Mastercard y manejá tu plata desde una billetera digital hecha para vos.
+        </p>
+        <div class="hero-btns reveal reveal-delay-3">
+          <a href="#descarga" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13M7 11l5 5 5-5"/><path d="M5 21h14"/></svg>
+            Descargar app
+          </a>
+          <a href="#comercios" class="btn btn-outline">Soy comercio</a>
+        </div>
+      </div>
+
+      <div class="hero-visual reveal reveal-delay-2" aria-hidden="true">
+        <img src="calf-hero.png" alt="App CalfPay" class="hero-app-img" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BENTO FEATURES ════════════════════════════════════════════════════ -->
+<section class="bento-section" id="beneficios" aria-labelledby="bento-title">
+  <div class="container">
+
+    <div class="bento-header">
+      <span class="section-label reveal">Para vos</span>
+      <h2 class="section-title reveal reveal-delay-1" id="bento-title">
+        Todo lo que necesitás,<br>en una sola app.
+      </h2>
+    </div>
+
+    <div class="bento-grid">
+
+      <!-- 1: Mastercard — 2 cols -->
+      <div class="bento-card bc-mid bento-wide reveal">
+        <div>
+          <div class="bc-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg>
+          </div>
+          <div class="bc-title">Tarjeta prepaga Mastercard</div>
+          <div class="bc-desc">Comprá online, en locales o en el exterior. La pedís desde la app, sin trámites.</div>
+        </div>
+      </div>
+
+      <!-- 2: Pagos — 1 col, verde -->
+      <div class="bento-card bc-green reveal reveal-delay-1">
+        <div>
+          <div class="bc-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+          <div class="bc-title">Pagos al instante</div>
+          <div class="bc-desc">Pagá y transferí sin vueltas ni demoras.</div>
+        </div>
+        <span class="bc-pill">CVU · QR · Alias</span>
+      </div>
+
+      <!-- 3: Plata rinde — 1 col, teal -->
+      <div class="bento-card bc-teal reveal">
+        <div>
+          <div class="bc-tna-num"><span id="bento-tna-counter">0</span>%</div>
+          <div class="bc-tna-unit">TNA</div>
+        </div>
+        <div>
+          <div class="bc-title">Tu plata rinde</div>
+          <div class="bc-desc">Rendimiento automático desde el primer día, sin moverla.</div>
+        </div>
+      </div>
+
+      <!-- 4: Abrí tu cuenta — 2 cols -->
+      <div class="bento-card bc-dark bento-wide reveal reveal-delay-1">
+        <div>
+          <div class="bc-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="bc-title">Abrí tu cuenta en minutos</div>
+          <div class="bc-desc">100% digital, sin turnos ni papeles. Solo con el celular y tu DNI.</div>
+        </div>
+        <span class="bc-pill bc-pill-white">Sin costo de apertura</span>
+      </div>
+
+      <!-- 5: Transferí — 1 col -->
+      <div class="bento-card bc-dark reveal">
+        <div class="bc-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
+        </div>
+        <div>
+          <div class="bc-title">Transferí con CVU o alias</div>
+          <div class="bc-desc">A cualquier billetera o banco del país, al instante.</div>
+        </div>
+      </div>
+
+      <!-- 6: Pagá servicios — 1 col -->
+      <div class="bento-card bc-dark reveal reveal-delay-1">
+        <div class="bc-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 14l-4-4 4-4"/><path d="M5 10h11a4 4 0 0 1 0 8h-1"/></svg>
+        </div>
+        <div>
+          <div class="bc-title">Pagá tus servicios</div>
+          <div class="bc-desc">Luz, gas, internet y más, sin colas y desde la app.</div>
+        </div>
+      </div>
+
+      <!-- 7: Retirá efectivo — 1 col -->
+      <div class="bento-card bc-dark reveal reveal-delay-2">
+        <div class="bc-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
+        </div>
+        <div>
+          <div class="bc-title">Retirá efectivo</div>
+          <div class="bc-desc">En cajeros habilitados en todo el país.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ SCROLL ANIMATION ══════════════════════════════════════════════════ -->
+<section class="scroll-anim-section" id="app-demo" aria-label="La app CalfPay en acción">
+  <div class="container scroll-anim-intro">
+    <span class="section-label reveal">Tarjeta CalfPay</span>
+    <h2 class="section-title reveal reveal-delay-1">Sale de la app.<br>Va con vos a todas partes.</h2>
+    <p class="section-sub reveal reveal-delay-2">Pedila en segundos y usala donde quieras.</p>
+  </div>
+
+  <div class="scroll-anim-container">
+    <div class="scroll-anim-sticky">
+      <canvas id="app-canvas" aria-hidden="true"></canvas>
+
+      <div class="scroll-hint" aria-hidden="true">
+        <div class="scroll-hint-line"></div>
+        <span>Scrolleá</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-anim-cta">
+    <a href="#descarga" class="btn btn-primary">Descargar app</a>
+  </div>
+</section>
+
+<!-- ══ TARJETA ════════════════════════════════════════════════════════════ -->
+<section class="section card-section" aria-labelledby="card-title">
+  <div class="container">
+    <div class="card-inner">
+      <div>
+        <span class="section-label reveal">Tu tarjeta</span>
+        <h2 class="section-title reveal reveal-delay-1" id="card-title">
+          La tarjeta que no sabías que necesitabas.
+        </h2>
+        <p class="section-sub reveal reveal-delay-2">
+          Pedila desde la app y usala para compras físicas, online, retiros y pagos dentro o fuera del país.
+        </p>
+        <div style="margin-top: 32px;" class="reveal reveal-delay-3">
+          <a href="#descarga" class="btn btn-primary">Pedila desde la App</a>
+        </div>
+        <div style="margin-top: 32px; display: flex; flex-direction: column; gap: 14px;" class="reveal reveal-delay-3">
+          <div style="display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,.7); font-size: 14px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#AEFF22" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Compras online y en locales físicos
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,.7); font-size: 14px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#AEFF22" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Aceptada en todo el mundo donde acepted Mastercard
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,.7); font-size: 14px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#AEFF22" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Retiros en cajeros automáticos
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,.7); font-size: 14px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#AEFF22" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Control total desde la app
+          </div>
+        </div>
+      </div>
+      <div class="big-card-wrap reveal reveal-delay-2" aria-hidden="true">
+        <img src="calf%20pay%20card.png" alt="Tarjeta CalfPay Mastercard prepaga" class="real-card-img" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ RENDIMIENTO ════════════════════════════════════════════════════════ -->
+<section class="section yield-section" aria-labelledby="yield-title">
+  <div class="container">
+    <div class="yield-inner">
+      <div>
+        <span class="section-label reveal">Rendimiento</span>
+        <h2 class="section-title reveal reveal-delay-1" id="yield-title">
+          Dejá tu plata quieta, pero no dormida.
+        </h2>
+        <p class="section-sub reveal reveal-delay-2">
+          Tu saldo puede generar rendimiento mientras sigue disponible para usar cuando quieras.
+        </p>
+        <div class="yield-features" style="margin-top: 36px;">
+          <div class="yield-feature reveal reveal-delay-2">
+            <div class="yf-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            </div>
+            <div>
+              <div class="yf-title">Rinde desde el primer día</div>
+              <div class="yf-desc">No necesitás hacer nada, el saldo rinde automáticamente mientras esté en tu cuenta.</div>
+            </div>
+          </div>
+          <div class="yield-feature reveal reveal-delay-3">
+            <div class="yf-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div>
+              <div class="yf-title">Disponible cuando quieras</div>
+              <div class="yf-desc">Tu plata no está bloqueada. La usás para pagar, transferir o retirar cuando necesitás.</div>
+            </div>
+          </div>
+          <div class="yield-feature reveal reveal-delay-4">
+            <div class="yf-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <div>
+              <div class="yf-title">Acreditación diaria</div>
+              <div class="yf-desc">El rendimiento se acredita en tu cuenta todos los días hábiles.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal reveal-delay-2">
+        <div class="yield-widget">
+          <div class="yield-label">Tasa Nominal Anual</div>
+          <div class="yield-number" id="tna-display"><span id="tna-counter">0</span><span>%</span></div>
+          <div class="yield-unit">TNA</div>
+          <div class="yield-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/></svg>
+            Tu saldo rinde todos los días
+          </div>
+          <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(0,0,0,.07);">
+            <div style="font-size: 12px; color: var(--gray); line-height: 1.6;">
+              La TNA puede variar. Consultá las condiciones vigentes en la app.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ COMERCIOS ══════════════════════════════════════════════════════════ -->
+<section class="section comercios-section" id="comercios" aria-labelledby="comercios-title">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label reveal">Para comercios</span>
+      <h2 class="section-title reveal reveal-delay-1" id="comercios-title">
+        Cobrá fácil. Acreditá rápido.<br>Vendé mejor.
+      </h2>
+      <p class="section-sub reveal reveal-delay-2">
+        Una solución simple para que tu negocio cobre con distintos medios de pago, controle sus movimientos y retire sus ingresos al final del día.
+      </p>
+    </div>
+    <div class="comercio-grid">
+      <div class="comercio-card reveal">
+        <div class="cc-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="cc-card-title">Acreditaciones inmediatas</div>
+        <div class="cc-card-desc">Recibís el dinero en tu cuenta CalfPay al instante, sin esperas.</div>
+      </div>
+      <div class="comercio-card reveal reveal-delay-1">
+        <div class="cc-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div class="cc-card-title">Comisiones competitivas</div>
+        <div class="cc-card-desc">Tarifas transparentes y convenientes para que te quede más en el bolsillo.</div>
+      </div>
+      <div class="comercio-card reveal reveal-delay-2">
+        <div class="cc-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <div class="cc-card-title">Movimientos online</div>
+        <div class="cc-card-desc">Controlá todas tus ventas y cobros en tiempo real desde la app.</div>
+      </div>
+      <div class="comercio-card reveal">
+        <div class="cc-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg>
+        </div>
+        <div class="cc-card-title">Distintos medios de pago</div>
+        <div class="cc-card-desc">Aceptá débito, crédito, transferencias y QR. Más formas de cobrar.</div>
+      </div>
+      <div class="comercio-card reveal reveal-delay-1">
+        <div class="cc-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        </div>
+        <div class="cc-card-title">Beneficios para tu negocio</div>
+        <div class="cc-card-desc">Accedé a promociones y beneficios exclusivos para comercios adheridos.</div>
+      </div>
+      <div class="comercio-card reveal reveal-delay-2">
+        <div class="cc-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
+        </div>
+        <div class="cc-card-title">Cobrá con terminal</div>
+        <div class="cc-card-desc">Terminal de cobro para tu local. Fácil de usar, con soporte incluido.</div>
+      </div>
+    </div>
+    <div class="comercios-cta reveal">
+      <a href="#descarga" class="btn btn-primary" style="font-size: 16px; padding: 16px 36px;">Quiero CalfPay en mi comercio</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ IDENTIDAD LOCAL ════════════════════════════════════════════════════ -->
+<section class="section local-section" aria-labelledby="local-title">
+  <div class="container">
+    <div class="local-inner">
+      <div>
+        <span class="section-label reveal">Nuestro origen</span>
+        <h2 class="section-title reveal reveal-delay-1" id="local-title">
+          Nació en Neuquén. Está lista para todo el país.
+        </h2>
+        <p class="section-sub reveal reveal-delay-2">
+          CalfPay combina tecnología financiera con una mirada local: una billetera pensada para acompañar a personas y comercios en su día a día. Simple, cercana y con identidad propia.
+        </p>
+        <div class="local-stats reveal reveal-delay-3">
+          <div class="local-stat">
+            <div class="ls-number">100<span>%</span></div>
+            <div class="ls-label">Digital, sin papeles</div>
+          </div>
+          <div class="local-stat">
+            <div class="ls-number"><span>+</span>24hs</div>
+            <div class="ls-label">Soporte disponible</div>
+          </div>
+          <div class="local-stat">
+            <div class="ls-number">0<span>$</span></div>
+            <div class="ls-label">Costo de apertura</div>
+          </div>
+          <div class="local-stat">
+            <div class="ls-number"><span>∞</span></div>
+            <div class="ls-label">Transferencias gratis</div>
+          </div>
+        </div>
+      </div>
+      <!-- SVG map: Argentina with Neuquén province highlighted -->
+      <div class="nqn-map reveal reveal-delay-2" aria-hidden="true">
+        <svg viewBox="0 0 320 530" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Argentina con Neuquén destacada">
+          <defs>
+            <linearGradient id="nqnFill" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#AEFF22"/>
+              <stop offset="100%" stop-color="#00A5BB"/>
+            </linearGradient>
+            <filter id="dotGlow" x="-100%" y="-100%" width="300%" height="300%">
+              <feGaussianBlur stdDeviation="5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="nqnGlow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="6" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <!-- Faint grid -->
+          <line x1="0" y1="175" x2="320" y2="175" stroke="#00A5BB" stroke-width=".5" opacity=".14" stroke-dasharray="5 9"/>
+          <line x1="0" y1="295" x2="320" y2="295" stroke="#00A5BB" stroke-width=".5" opacity=".11" stroke-dasharray="5 9"/>
+          <line x1="0" y1="415" x2="320" y2="415" stroke="#00A5BB" stroke-width=".5" opacity=".08" stroke-dasharray="5 9"/>
+          <line x1="105" y1="0" x2="105" y2="530" stroke="#AEFF22" stroke-width=".5" opacity=".09" stroke-dasharray="5 9"/>
+          <line x1="215" y1="0" x2="215" y2="530" stroke="#AEFF22" stroke-width=".5" opacity=".09" stroke-dasharray="5 9"/>
+
+          <!-- Argentina silhouette -->
+          <path d="
+            M 52,15
+            L 105,12 L 175,10 L 215,13 L 250,28
+            L 272,52 L 282,82 L 280,108
+            L 262,118 L 266,150 L 250,182
+            L 236,215 L 222,250 L 208,284
+            L 192,320 L 175,358 L 158,396
+            L 140,433 L 122,468 L 104,500
+            L 88,520 L 98,524 L 112,514
+            L 118,524 L 110,532 L 94,530
+            L 78,520 L 64,502 L 52,478
+            L 44,450 L 42,420 L 40,390
+            L 40,360 L 41,330 L 42,300
+            L 43,270 L 44,240 L 44,210
+            L 44,180 L 44,150 L 44,120
+            L 44,90  L 46,60  L 50,30
+            Z"
+            fill="rgba(255,255,255,0.05)"
+            stroke="rgba(255,255,255,0.18)"
+            stroke-width="1.5"
+            stroke-linejoin="round"/>
+
+          <!-- Neuquén province (upper-left Patagonia, ~36.5°S–40.8°S, Andes to ~67°W) -->
+          <path d="
+            M 44,215
+            L 148,210
+            L 140,286
+            L 44,292
+            Z"
+            fill="url(#nqnFill)"
+            opacity=".82"
+            filter="url(#nqnGlow)"/>
+
+          <!-- Neuquén province border -->
+          <path d="
+            M 44,215
+            L 148,210
+            L 140,286
+            L 44,292
+            Z"
+            fill="none"
+            stroke="#AEFF22"
+            stroke-width="1.8"
+            stroke-linejoin="round"/>
+
+          <!-- Neuquén capital city dot -->
+          <circle cx="118" cy="248" r="18" fill="#AEFF22" opacity=".1"/>
+          <circle cx="118" cy="248" r="10" fill="#AEFF22" opacity=".22"/>
+          <circle cx="118" cy="248" r="5"  fill="#AEFF22" filter="url(#dotGlow)"/>
+
+          <!-- Label -->
+          <text x="128" y="244" font-family="Space Grotesk, system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#AEFF22" letter-spacing="0.04em">Neuquén</text>
+
+          <!-- Minor city dots -->
+          <circle cx="90"  cy="188" r="3" fill="#00A5BB" opacity=".55"/>
+          <circle cx="155" cy="232" r="2.5" fill="#00A5BB" opacity=".45"/>
+          <circle cx="80"  cy="310" r="2.5" fill="rgba(255,255,255,.3)"/>
+          <circle cx="210" cy="155" r="2.5" fill="rgba(255,255,255,.25)"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ DESCARGA ════════════════════════════════════════════════════════════ -->
+<section class="section download-section" id="descarga" aria-labelledby="download-title">
+  <div class="container">
+    <div class="download-inner">
+      <span class="section-label reveal" style="color: var(--green);">Disponible gratis</span>
+      <h2 class="section-title reveal reveal-delay-1" id="download-title" style="max-width: 600px; margin-inline: auto; margin-bottom: 14px;">
+        Empezá a usar CalfPay hoy.
+      </h2>
+      <p class="section-sub reveal reveal-delay-2" style="margin-inline: auto;">
+        Descargá la app, abrí tu cuenta y empezá a manejar tu plata de una forma más simple.
+      </p>
+      <div class="download-btns reveal reveal-delay-3">
+        <!-- App Store -->
+        <a href="#" class="store-btn" aria-label="Descargar en App Store">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          <div style="text-align: left;">
+            <div style="font-size: 10px; opacity: .7; font-weight: 400;">Descargá en</div>
+            <div>App Store</div>
+          </div>
+        </a>
+        <!-- Google Play -->
+        <a href="#" class="store-btn" aria-label="Descargar en Google Play">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.18 23.76c.3.17.64.24.99.19l12.48-7.34-2.79-2.79-10.68 9.94zM.58 1.1C.22 1.47 0 2.05 0 2.8v18.4c0 .75.22 1.33.58 1.7l.09.08 10.31-10.31v-.24L.67 1.02.58 1.1zM20.35 10.68l-2.92-1.72-3.1 3.1 3.1 3.1 2.95-1.73c.84-.49.84-1.3-.03-1.75zM3.18.24L15.66 7.58l-2.79 2.79L2.19.43c.29-.19.66-.25.99-.19z"/></svg>
+          <div style="text-align: left;">
+            <div style="font-size: 10px; opacity: .7; font-weight: 400;">Disponible en</div>
+            <div>Google Play</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ═════════════════════════════════════════════════════════════ -->
+<footer class="footer" role="contentinfo" id="ayuda">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="logo">
+            <img src="https://calfpay.ar/wp-content/uploads/2025/03/Calfpay-Color.png" alt="CalfPay" />
+          </div>
+          <p>La billetera digital de Neuquén. Pagá, transferí, cobrá y hacé rendir tu plata desde una sola app.</p>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Personas</div>
+          <ul>
+            <li><a href="#">Abrí tu cuenta</a></li>
+            <li><a href="#">Invertí</a></li>
+            <li><a href="#">Tarjeta Prepaga Mastercard</a></li>
+            <li><a href="#">Transferí</a></li>
+            <li><a href="#">Retirá dinero</a></li>
+            <li><a href="#">Pagá tus servicios</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Comercios</div>
+          <ul>
+            <li><a href="#">Cobrá con tu terminal</a></li>
+            <li><a href="#">Beneficios</a></li>
+            <li><a href="#">Retirá ingresos</a></li>
+            <li><a href="#">Comisiones</a></li>
+            <li><a href="#">Medios de pago</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Acerca de</div>
+          <ul>
+            <li><a href="#">Ayuda en línea</a></li>
+            <li><a href="#">Términos y condiciones</a></li>
+            <li><a href="#">Comisiones y cargos</a></li>
+            <li><a href="#">Logo oficial</a></li>
+          </ul>
+          <div style="margin-top: 20px;">
+            <div class="footer-col-title">Redes</div>
+            <a href="https://instagram.com/calfpay" target="_blank" rel="noopener noreferrer" class="ig-link" aria-label="CalfPay en Instagram">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              @calfpay
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p style="color:rgba(255,255,255,.38);">© 2026 CalfPay. Todos los derechos reservados. <span class="divider-dot" aria-hidden="true"></span> Neuquén, Argentina.</p>
+        <p style="font-size:11px;color:rgba(255,255,255,.25);">Rediseño por <a href="https://www.linkedin.com/in/mausa10" target="_blank" rel="noopener" style="color:rgba(255,255,255,.45);text-decoration:underline;text-underline-offset:3px;transition:color .15s;" onmouseover="this.style.color='rgba(255,255,255,.85)'" onmouseout="this.style.color='rgba(255,255,255,.45)'">Mauricio Sawicki</a></p>
+        <div class="footer-legal">
+          <a href="#">Privacidad</a>
+          <a href="#">Términos</a>
+          <a href="#">Cookies</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ── TNA config (editar aquí) ──────────────────────────────────────────
+  const TNA = 45;
+
+  // ── Hamburger ─────────────────────────────────────────────────────────
+  const hamburger = document.querySelector('.hamburger');
+  const mobileNav = document.querySelector('.mobile-nav');
+  hamburger.addEventListener('click', () => {
+    const isOpen = mobileNav.classList.toggle('open');
+    hamburger.classList.toggle('open', isOpen);
+    hamburger.setAttribute('aria-expanded', isOpen);
+  });
+  mobileNav.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      mobileNav.classList.remove('open');
+      hamburger.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // ── Scroll reveal ─────────────────────────────────────────────────────
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ── TNA counter animation ─────────────────────────────────────────────
+  const tnaEl = document.getElementById('tna-counter');
+  let tnaAnimated = false;
+  const tnaObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && !tnaAnimated) {
+        tnaAnimated = true;
+        let start = 0;
+        const duration = 1200;
+        const startTime = performance.now();
+        const tick = (now) => {
+          const elapsed = now - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          // ease-out quad
+          const eased = 1 - (1 - progress) * (1 - progress);
+          const current = Math.round(eased * TNA);
+          tnaEl.textContent = current;
+          if (progress < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+        tnaObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  tnaObserver.observe(document.getElementById('tna-display'));
+
+  // ── Bento TNA counter ─────────────────────────────────────────────────
+  const bentoTnaEl = document.getElementById('bento-tna-counter');
+  let bentoAnimated = false;
+  if (bentoTnaEl) {
+    new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting && !bentoAnimated) {
+          bentoAnimated = true;
+          let start = 0;
+          const duration = 1400;
+          const startTime = performance.now();
+          const tick = (now) => {
+            const p = Math.min((now - startTime) / duration, 1);
+            const eased = 1 - (1 - p) * (1 - p);
+            bentoTnaEl.textContent = Math.round(eased * TNA);
+            if (p < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }
+      });
+    }, { threshold: 0.5 }).observe(bentoTnaEl);
+  }
+
+  // ── SCROLL PROGRESS BAR ───────────────────────────────────────────────
+  const progBar = document.querySelector('.scroll-prog');
+  window.addEventListener('scroll', () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    if (progBar && max > 0) progBar.style.width = (window.scrollY / max * 100) + '%';
+  }, { passive: true });
+
+  // ── SCROLL ANIMATION ──────────────────────────────────────────────────
+  (function initScrollAnim() {
+    const TOTAL_FRAMES = 99;
+    const canvas = document.getElementById('app-canvas');
+    if (!canvas) return;
+
+    const ctx       = canvas.getContext('2d');
+    const container = document.querySelector('.scroll-anim-container');
+    const hint      = document.querySelector('.scroll-hint');
+
+    let rafId  = null;
+    let lastFi = -1;
+
+    function absTop(el) {
+      let t = 0;
+      while (el) { t += el.offsetTop; el = el.offsetParent; }
+      return t;
+    }
+
+    const frames = new Array(TOTAL_FRAMES);
+
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      const w = window.innerWidth;
+      // Mobile portrait: square canvas so the square video fills perfectly
+      const h = (w < 768 && w < window.innerHeight) ? w : window.innerHeight;
+      canvas.width  = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width  = w + 'px';
+      canvas.style.height = h + 'px';
+      if (lastFi >= 0 && frames[lastFi] && frames[lastFi].complete) drawFrame(lastFi);
+    }
+
+    function drawFrame(idx) {
+      const img = frames[idx];
+      if (!img || !img.complete || !img.naturalWidth) return;
+      const cw = canvas.width, ch = canvas.height;
+      const iw = img.naturalWidth, ih = img.naturalHeight;
+      ctx.clearRect(0, 0, cw, ch);
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, cw, ch);
+      const scale = Math.min(cw / iw, ch / ih);
+      const dw = iw * scale, dh = ih * scale;
+      ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+    }
+
+    let loaded = 0;
+    for (let i = 0; i < TOTAL_FRAMES; i++) {
+      const img = new Image();
+      img.src = 'frames/frame_' + String(i + 1).padStart(4, '0') + '.jpg';
+      img.onload = () => { if (++loaded === TOTAL_FRAMES) drawFrame(0); };
+      frames[i] = img;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    window.addEventListener('scroll', function onScroll() {
+      if (!container) return;
+      const containerAbsTop = absTop(container);
+      const totalH  = container.offsetHeight - window.innerHeight;
+      const scrolled = window.scrollY - containerAbsTop;
+      const p = Math.max(0, Math.min(1, scrolled / totalH));
+
+      const fi = Math.min(TOTAL_FRAMES - 1, Math.round(p * (TOTAL_FRAMES - 1)));
+      if (fi !== lastFi) {
+        lastFi = fi;
+        cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => drawFrame(fi));
+      }
+
+      if (hint) hint.style.opacity = scrolled > 80 ? '0' : '1';
+    }, { passive: true });
+  })();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Source videos (large, not served)
+*.mp4
+*.mov
+*.webm
+
+# Reference / working images not used by the site
+ejemplo.png
+logo-calfpay.png
+real-card.png
+two-cards.png
+card-front-view.png
+card-wallet-view.png
+calf-card-view2.png
+ChatGPT\ Image*.png
+
+# Claude internal files
+.claude/
+CLAUDE.md
+SKILL3d.md
