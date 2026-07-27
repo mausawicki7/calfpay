@@ -448,6 +448,27 @@
     .cc-mc-c2 { width: 18px; height: 18px; border-radius: 50%; background: #F79E1B; opacity: .9; margin-left: -8px; }
     .cc-prepago { font-size: 7px; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .06em; }
 
+    /* ── VIDEO LANZAMIENTO ──────────────────────────────────────────────── */
+    .video-section { padding-block: 56px; background: var(--bg); }
+    @media (min-width: 768px) { .video-section { padding-block: 100px; } }
+    .video-header { margin-bottom: 32px; text-align: center; }
+    .video-header .section-title { margin-inline: auto; max-width: 640px; }
+    .video-header .section-sub { margin-inline: auto; max-width: 520px; }
+    .video-card {
+      position: relative;
+      width: 100%;
+      border-radius: var(--r-card);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      background: #000;
+    }
+    .video-card video {
+      width: 100%;
+      display: block;
+      aspect-ratio: 2946 / 1262;
+      object-fit: cover;
+    }
+
     /* ── BENTO SECTION ───────────────────────────────────────────────────── */
     .bento-section {
       background: #080A0D;
@@ -1003,7 +1024,6 @@
       background: rgba(255,255,255,.015);
       backdrop-filter: blur(6px);
       padding: 11px 0;
-      transform: rotate(-1.2deg) scaleX(1.06);
       margin-block: 4px;
     }
     .cf-marquee-track {
@@ -1302,6 +1322,22 @@
       <div class="hero-visual reveal reveal-delay-2" aria-hidden="true">
         <img src="calf-hero.png" alt="App CalfPay" class="hero-app-img" />
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ VIDEO LANZAMIENTO ═══════════════════════════════════════════════════ -->
+<section class="video-section" aria-labelledby="video-title">
+  <div class="container">
+    <div class="video-header">
+      <span class="section-label reveal">Nuevo</span>
+      <h2 class="section-title reveal reveal-delay-1" id="video-title">Estamos introduciendo un nuevo servicio.</h2>
+      <p class="section-sub reveal reveal-delay-2">Va a cambiar tu manera de pagar, invertir y ahorrar. Más rápido y mejor que nunca.</p>
+    </div>
+    <div class="video-card reveal reveal-delay-2">
+      <video controls playsinline preload="metadata" poster="assets/video-poster.jpg" aria-label="Presentación de CalfPay">
+        <source src="videos/calfpay-lanzamiento.mp4" type="video/mp4" />
+      </video>
     </div>
   </div>
 </section>
