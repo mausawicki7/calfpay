@@ -3,6 +3,9 @@
 *.mov
 *.webm
 
+# Reference / working files not meant for GitHub
+DISPLAY CARPITA CALFPAY.pdf
+
 # Reference / working images not used by the site
 ejemplo.png
 logo-calfpay.png

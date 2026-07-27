@@ -1316,10 +1316,24 @@
 
 <!-- ══ VIDEO LANZAMIENTO ═══════════════════════════════════════════════════ -->
 <section class="video-section" aria-label="Presentación de CalfPay">
-  <video autoplay muted loop playsinline preload="metadata" poster="assets/video-poster.jpg">
-    <source src="videos/calfpay-lanzamiento.mp4" type="video/mp4" />
+  <video id="launch-video" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="assets/video-poster.jpg">
+    <source src="videos/calfpay-lanzamiento-web.mp4" type="video/mp4" />
   </video>
 </section>
+<script>
+  // Algunos navegadores/webviews móviles ignoran el atributo autoplay del
+  // HTML si no se refuerza vía JS con muted=true antes de play().
+  (function () {
+    var v = document.getElementById('launch-video');
+    if (!v) return;
+    v.muted = true;
+    var tryPlay = function () { v.play().catch(function () {}); };
+    tryPlay();
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) tryPlay();
+    });
+  })();
+</script>
 
 <!-- ══ BENTO FEATURES ════════════════════════════════════════════════════ -->
 <section class="bento-section" id="beneficios" aria-labelledby="bento-title">
