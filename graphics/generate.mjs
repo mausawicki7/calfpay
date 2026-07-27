@@ -52,7 +52,7 @@ try {
     });
     await page.close();
 
-    console.log(`✔ ${name}.pdf  (${piece.width}×${piece.height}pt)`);
+    console.log(`✔ ${name}.pdf  (${piece.width}×${piece.height}${piece.unit || 'pt'})`);
   }
 } finally {
   await browser.close();

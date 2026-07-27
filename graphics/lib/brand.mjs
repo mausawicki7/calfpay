@@ -65,6 +65,40 @@ export function cardImg({ width = 260, rotate = -6 } = {}) {
   " />`;
 }
 
+// Placeholder de código QR — un marco glassmorphism (igual receta que
+// .bento-card/.bc-dark: vidrio esmerilado + borde + glow orb) alrededor del
+// recuadro blanco donde va el QR real, con las marcas de encuadre típicas
+// de un lector para que se note que es un espacio reservado.
+export function qrPlaceholder({ size = 260, label = 'QR acá', inline = false } = {}) {
+  const pad = 22;
+  const bracket = (top, left, borderStyle) => `
+    <div aria-hidden="true" style="position:absolute; ${top} ${left} width:26px; height:26px; ${borderStyle}"></div>`;
+  return `
+    <div style="
+      display:${inline ? 'inline-block' : 'block'}; position:relative; overflow:hidden;
+      padding:${pad}px; border-radius:28px;
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14);
+    ">
+      <div aria-hidden="true" style="
+        position:absolute; top:-90px; left:-90px; width:220px; height:220px;
+        border-radius:50%; pointer-events:none;
+        background: radial-gradient(circle, rgba(174,255,34,.14) 0%, transparent 70%);
+      "></div>
+      <div style="
+        position:relative; z-index:1;
+        width:${size}px; height:${size}px;
+        background:${tokens.white}; border-radius:16px;
+        display:flex; align-items:center; justify-content:center;
+      ">
+        ${bracket('top:14px;', 'left:14px;', `border-top:4px solid ${tokens.dark}; border-left:4px solid ${tokens.dark}; border-radius:6px 0 0 0;`)}
+        ${bracket('top:14px;', 'right:14px;', `border-top:4px solid ${tokens.dark}; border-right:4px solid ${tokens.dark}; border-radius:0 6px 0 0;`)}
+        ${bracket('bottom:14px;', 'left:14px;', `border-bottom:4px solid ${tokens.dark}; border-left:4px solid ${tokens.dark}; border-radius:0 0 0 6px;`)}
+        ${bracket('bottom:14px;', 'right:14px;', `border-bottom:4px solid ${tokens.dark}; border-right:4px solid ${tokens.dark}; border-radius:0 0 6px 0;`)}
+        <span style="font-size:15px; font-weight:600; color:${tokens.gray}; letter-spacing:.02em;">${label}</span>
+      </div>
+    </div>`;
+}
+
 // Marca de agua decorativa — el mismo rombo del isotipo, hueco y muy sutil,
 // para llenar de textura de marca los espacios en blanco sin competir con
 // el contenido principal.
