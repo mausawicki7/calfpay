@@ -449,20 +449,8 @@
     .cc-prepago { font-size: 7px; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .06em; }
 
     /* ── VIDEO LANZAMIENTO ──────────────────────────────────────────────── */
-    .video-section { padding-block: 56px; background: var(--bg); }
-    @media (min-width: 768px) { .video-section { padding-block: 100px; } }
-    .video-header { margin-bottom: 32px; text-align: center; }
-    .video-header .section-title { margin-inline: auto; max-width: 640px; }
-    .video-header .section-sub { margin-inline: auto; max-width: 520px; }
-    .video-card {
-      position: relative;
-      width: 100%;
-      border-radius: var(--r-card);
-      overflow: hidden;
-      box-shadow: var(--shadow-md);
-      background: #000;
-    }
-    .video-card video {
+    .video-section { display: block; background: #000; line-height: 0; }
+    .video-section video {
       width: 100%;
       display: block;
       aspect-ratio: 2946 / 1262;
@@ -1327,19 +1315,10 @@
 </section>
 
 <!-- ══ VIDEO LANZAMIENTO ═══════════════════════════════════════════════════ -->
-<section class="video-section" aria-labelledby="video-title">
-  <div class="container">
-    <div class="video-header">
-      <span class="section-label reveal">Nuevo</span>
-      <h2 class="section-title reveal reveal-delay-1" id="video-title">Estamos introduciendo un nuevo servicio.</h2>
-      <p class="section-sub reveal reveal-delay-2">Va a cambiar tu manera de pagar, invertir y ahorrar. Más rápido y mejor que nunca.</p>
-    </div>
-    <div class="video-card reveal reveal-delay-2">
-      <video controls playsinline preload="metadata" poster="assets/video-poster.jpg" aria-label="Presentación de CalfPay">
-        <source src="videos/calfpay-lanzamiento.mp4" type="video/mp4" />
-      </video>
-    </div>
-  </div>
+<section class="video-section" aria-label="Presentación de CalfPay">
+  <video autoplay muted loop playsinline preload="metadata" poster="assets/video-poster.jpg">
+    <source src="videos/calfpay-lanzamiento.mp4" type="video/mp4" />
+  </video>
 </section>
 
 <!-- ══ BENTO FEATURES ════════════════════════════════════════════════════ -->
