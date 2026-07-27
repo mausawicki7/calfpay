@@ -1,0 +1,13 @@
+{
+  "name": "calfpay-graphics",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Generador de piezas gráficas (PDF) para CalfPay a partir de la estética de calfpay.ar",
+  "type": "module",
+  "scripts": {
+    "generate": "node generate.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.48.0"
+  }
+}

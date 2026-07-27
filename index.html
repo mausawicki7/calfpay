@@ -9,6 +9,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
+    /* ── FONTS ──────────────────────────────────────────────────────────── */
+    /* Nohemi: tipografía oficial de CalfPay para títulos. Se cargan sólo los
+       pesos usados en la jerarquía de titulares (ver --font-heading). */
+    @font-face { font-family: 'Nohemi'; src: url('fonts/nohemi/Nohemi-Medium.ttf') format('truetype'); font-weight: 500; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Nohemi'; src: url('fonts/nohemi/Nohemi-SemiBold.ttf') format('truetype'); font-weight: 600; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Nohemi'; src: url('fonts/nohemi/Nohemi-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Nohemi'; src: url('fonts/nohemi/Nohemi-ExtraBold.ttf') format('truetype'); font-weight: 800; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Nohemi'; src: url('fonts/nohemi/Nohemi-Black.ttf') format('truetype'); font-weight: 900; font-style: normal; font-display: swap; }
+
     /* ── TOKENS ─────────────────────────────────────────────────────────── */
     :root {
       --green:   #AEFF22;
@@ -27,7 +36,8 @@
       --shadow:  0 4px 24px rgba(0,0,0,.07);
       --shadow-md: 0 8px 40px rgba(0,0,0,.12);
 
-      --font: 'Space Grotesk', 'Nohemi', system-ui, sans-serif;
+      --font: 'Space Grotesk', system-ui, sans-serif;
+      --font-heading: 'Nohemi', 'Space Grotesk', system-ui, sans-serif;
       --ease: cubic-bezier(.22,1,.36,1);
     }
 
@@ -244,6 +254,7 @@
     .hero-badge-dot svg { width: 12px; height: 12px; }
 
     .hero-title {
+      font-family: var(--font-heading);
       font-size: clamp(2.4rem, 5vw, 4rem);
       font-weight: 700;
       line-height: 1.08;
@@ -537,7 +548,8 @@
     .bc-teal  .bc-label { color: rgba(255,255,255,.55); }
 
     .bc-title {
-      font-size: 19px; font-weight: 700;
+      font-family: var(--font-heading);
+      font-size: 19px; font-weight: 500;
       line-height: 1.25; letter-spacing: -.015em;
       margin-bottom: 8px;
     }
@@ -613,8 +625,9 @@
       margin-bottom: 12px;
     }
     .section-title {
+      font-family: var(--font-heading);
       font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-      font-weight: 700;
+      font-weight: 600;
       line-height: 1.15;
       letter-spacing: -.025em;
       margin-bottom: 14px;
@@ -813,7 +826,7 @@
       flex-shrink: 0;
     }
     .yf-icon svg { width: 20px; height: 20px; color: var(--teal); }
-    .yf-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .yf-title { font-family: var(--font-heading); font-size: 15px; font-weight: 500; margin-bottom: 4px; }
     .yf-desc  { font-size: 13px; color: var(--gray); line-height: 1.5; }
 
     /* ── COMERCIOS ──────────────────────────────────────────────────────── */
@@ -1036,8 +1049,9 @@
     /* CTA area */
     .cf-cta-area { position: relative; z-index: 2; padding: 80px 0 60px; text-align: center; }
     .cf-heading {
+      font-family: var(--font-heading);
       font-size: clamp(2.2rem, 5.5vw, 4.8rem);
-      font-weight: 900; letter-spacing: -.04em; line-height: 1.06; margin-bottom: 48px;
+      font-weight: 700; letter-spacing: -.04em; line-height: 1.06; margin-bottom: 48px;
       background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,.48) 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;

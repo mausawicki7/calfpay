@@ -17,3 +17,7 @@ ChatGPT\ Image*.png
 .claude/
 CLAUDE.md
 SKILL3d.md
+
+# Generador de piezas gráficas
+graphics/node_modules/
+graphics/output/
